@@ -119,7 +119,7 @@ public class GameView extends View {
                 appleY = gameBoardY[(int) Math.round(appleYF)];
 
                 //w sumie niepotrzebnie sobie skomplikowałem trzymajac informacje o pozycji pierwszej czesci weza w oddzielnym obiekcie
-                // ale jest godzina 6:30, jeszcze nie poszedłem spać i na prawdę nie chce mi się już tego zmieniać
+                //ale jest godzina 6:30, jeszcze nie poszedłem spać i naprawdę nie chce mi się już tego zmieniać
 
                 snakeHead = new SnakeBody(gameBoardX[gameBoardX.length/2],gameBoardY[gameBoardY.length/2], snakeBodySize);
 
@@ -180,7 +180,7 @@ public class GameView extends View {
 
                 postInvalidate();
             }
-        },1500,600);
+        },1500,400);
 
 
     }

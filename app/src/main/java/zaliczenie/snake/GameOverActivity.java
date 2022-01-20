@@ -11,21 +11,29 @@ import android.widget.TextView;
 
 public class GameOverActivity extends AppCompatActivity {
 
-    View playButton;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_over);
+
+
+
         TextView finalScore = findViewById(R.id.finalScoreTextView);
         TextView highScore = findViewById(R.id.highScoreTextView);
-        playButton = findViewById(R.id.playAgainButton);
+        View playButton = findViewById(R.id.playAgainButton);
+
+        //score jest przekazywany z GameActivity
         int score = getIntent().getIntExtra("Score", 0);
 
         finalScore.setText("Score: "+score );
 
         SharedPreferences sharedPreferences = getSharedPreferences("GAME_DATA", Context.MODE_PRIVATE);
+
+        //ustawiam najwyzszy wynik
+
         int hScore = sharedPreferences.getInt("HIGH_SCORE", 0);
 
         if (score > hScore) {

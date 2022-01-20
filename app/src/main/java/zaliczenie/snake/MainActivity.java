@@ -8,17 +8,15 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     View playButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //za pomoca guzika, ktory tak na prawdę jest ImageView odpalam GameActivity
+
         setContentView(R.layout.activity_main);
-
-
-
 
         playButton = findViewById(R.id.playButtonImageView);
 

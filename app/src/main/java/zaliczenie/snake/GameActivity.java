@@ -23,6 +23,7 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
@@ -40,6 +41,8 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        //po tapnieciu w ekran odpalam moje customowe view zawierajace gre
+
         if(!gameStart){
             text.setVisibility(View.INVISIBLE);
             gameView.startGame();
@@ -50,11 +53,14 @@ public class GameActivity extends AppCompatActivity {
         return super.onTouchEvent(event);
     }
 
+
+    //dodaje punkciki na wyswietlaczu
     public void addPoint(int score){
         this.score = score;
         scoreText.setText(""+this.score);
     }
 
+    //przekazuje GameOverActivity wynik i odpalam GameOverActivity
     public void gameOver(int score){
         Intent intent = new Intent(getApplicationContext(), GameOverActivity.class);
         intent.putExtra("Score", score);

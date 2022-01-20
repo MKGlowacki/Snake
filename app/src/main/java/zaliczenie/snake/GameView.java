@@ -38,8 +38,8 @@ public class GameView extends View {
     double appleXF, appleYF;
     int appleX, appleY;
     boolean appleDiff, snakeDiff;
-    GameActivity gameActivity;
 
+    //konstruktory wywołują metodę init(), która jest odpowiedzialna za ustawienie odpowiednich parametrów
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -61,28 +61,31 @@ public class GameView extends View {
         init(null);
     }
 
+
     public void init(@Nullable AttributeSet set ) {
+
         snakeLength = 1;
         points = 0;
         direction = 3;
+
+        //tworzymy kwadrat oraz kolor do niego, dodajemy anti-aliasing
         snakeHeadRect = new Rect();
         snakeHeadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        snakeHeadPaint.setColor(Color.GREEN);
 
-        appleRect = new Rect();
+
+
 
         gameBoardX[0] = 0;
         gameBoardY[0] = 0;
 
-
+        appleRect = new Rect();
         applePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         applePaint.setColor(Color.RED);
 
-
-
-        snakeHeadPaint.setColor(Color.GREEN);
-
-
         if (set == null) return;
+
+        //dodajemy kolor tła oraz rozmiar snake'a z plikow xml (jest on podany w db, jednak, żeby rysować na canvasie potrzebne nam wartości w pixelach)
 
         TypedArray ta = getContext().obtainStyledAttributes(set, R.styleable.GameView);
         gameBgColor = ta.getColor(R.styleable.GameView_game_bg_color, Color.YELLOW);
@@ -90,14 +93,14 @@ public class GameView extends View {
         ta.recycle();
 
 
-
+        // nasłuchujemy informacje na temat rozmiaru naszego customowego widoku
 
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-
+                //do dwóch tablic wpisujemy na jakich pixelach znajdują się poszczególne kratki
                 for(int i = 1; i<(getHeight()/snakeBodySize); i++){
 
                     if(i<(getWidth()/snakeBodySize)){
@@ -108,15 +111,19 @@ public class GameView extends View {
                 }
 
                 // F = float
+                // losujemy gdzie ma sie pojawic pierwsze jablko
                 appleXF = Math.random() * (gameBoardX.length-1);
                 appleYF= Math.random() * (gameBoardY.length-1);
 
                 appleX = gameBoardX[(int) Math.round(appleXF)] ;
                 appleY = gameBoardY[(int) Math.round(appleYF)];
 
+                //w sumie niepotrzebnie sobie skomplikowałem trzymajac informacje o pozycji pierwszej czesci weza w oddzielnym obiekcie
+                // ale jest godzina 6:30, jeszcze nie poszedłem spać i na prawdę nie chce mi się już tego zmieniać
+
                 snakeHead = new SnakeBody(gameBoardX[gameBoardX.length/2],gameBoardY[gameBoardY.length/2], snakeBodySize);
 
-
+                //poszczegolne czesci weza trzymam w tablicy dwuwymiarowej, pierwsza rubryka oznacza, ktora to czesc weza, a druga czy to wspolrzedna x czy y
 
                 snake[0][0] = snakeHead.x1;
                 snake[0][1] = snakeHead.y1;
@@ -132,15 +139,21 @@ public class GameView extends View {
 
     public void startGame(){
 
+        //odplamay sobie timer, zeby gierka dzialala w petli
+
         Timer gameTimer = new Timer();
-        TextView pointCounter = findViewById(R.id.text);
+
 
         gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+
+                //rozrost weza i poruszanie sie
                 snakeDiff = true;
                 snakeLength = points+1;
                 snakeMove(direction);
+
+                //sprawdzanie czy sam siebie nie zjada
 
                 for (int i = 1; i < snakeLength; i++){
                     if(snake[0][0]==snake[i][0] && snake[0][1]==snake[i][1]){
@@ -148,6 +161,8 @@ public class GameView extends View {
                         snakeDiff = false;
                     }
                 }
+
+                //warunek sprawdzajacy czy nie przegralismy
                 System.out.println("snake[0][0]: "+snake[0][0]+" snake[0][1]: "+ snake[0][1] +" MaxH: "+ getHeight() + " MaxW: "+ getWidth());
                 if(snakeDiff == false || snake[0][0] < 0 || snake[0][0] >= getWidth() || snake[0][1] < 0 || snake[0][1] >= getHeight()){
                     gameTimer.cancel();
@@ -155,7 +170,7 @@ public class GameView extends View {
                     ((GameActivity)getContext()).gameOver(points);
                     return;
                 }
-
+                //sprawdzanie czy zjadl jablko
                 if (snake[0][0] == appleX && snake[0][1] == appleY){
                     points++;
                     ((GameActivity)getContext()).addPoint(points);
@@ -175,6 +190,8 @@ public class GameView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+
+        //rysujemy nasze wszystkie kwadraciki
 
         super.onDraw(canvas);
         canvas.drawColor(gameBgColor);
@@ -203,6 +220,8 @@ public class GameView extends View {
 
     private void snakeMove(int direction) {
 
+        //poruszanie sie weza
+
         for (int i = snakeLength-1; i>0;i--){
             snake[i][0] = snake[i-1][0];
             snake[i][1] = snake[i-1][1];
@@ -228,6 +247,8 @@ public class GameView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        //jak klikniemy w lewa czesc ekranu to skreci w lewo i analogicznie ze skrecaniem w prawo
+
         lastTouchX = event.getX();
 
         if(lastTouchX > getWidth()/2) {
@@ -251,6 +272,8 @@ public class GameView extends View {
 
 
     public void newPoint(){
+
+        //jak zjemy jablko to tu sie tworzy nowe
 
         appleDiff = true;
 

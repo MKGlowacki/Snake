@@ -1,6 +1,7 @@
 package zaliczenie.snake;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -28,16 +30,16 @@ public class GameView extends View {
     private int gameBgColor;
     private int direction;
     private SnakeBody snakeHead;
-    private int points = 0;
+    private int points;
     private int[][] snake = new int[1000][2];
     private int[] gameBoardX = new int[14], gameBoardY = new int[22];
-    private int snakeLength = 1;
+    private int snakeLength;
     float lastTouchX;
-    boolean ifHead = true;
-    int tempX, tempY;
     double appleXF, appleYF;
     int appleX, appleY;
-    boolean appleDiff;
+    boolean appleDiff, snakeDiff;
+    GameActivity gameActivity;
+
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -60,7 +62,9 @@ public class GameView extends View {
     }
 
     public void init(@Nullable AttributeSet set ) {
-        direction = 0;
+        snakeLength = 1;
+        points = 0;
+        direction = 3;
         snakeHeadRect = new Rect();
         snakeHeadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -118,7 +122,7 @@ public class GameView extends View {
                 snake[0][1] = snakeHead.y1;
 
 
-                //System.out.println(snake.length);
+
 
             }
         });
@@ -127,18 +131,34 @@ public class GameView extends View {
     }
 
     public void startGame(){
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+
+        Timer gameTimer = new Timer();
+        TextView pointCounter = findViewById(R.id.text);
+
+        gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-
+                snakeDiff = true;
                 snakeLength = points+1;
                 snakeMove(direction);
-                if(snakeHeadRect.top < 0 || snakeHeadRect.bottom > getHeight() || snakeHeadRect.left < 0 || snakeHeadRect.right > getWidth()){
+
+                for (int i = 1; i < snakeLength; i++){
+                    if(snake[0][0]==snake[i][0] && snake[0][1]==snake[i][1]){
+                        System.out.println("Snake diff: "+snakeDiff);
+                        snakeDiff = false;
+                    }
+                }
+                System.out.println("snake[0][0]: "+snake[0][0]+" snake[0][1]: "+ snake[0][1] +" MaxH: "+ getHeight() + " MaxW: "+ getWidth());
+                if(snakeDiff == false || snake[0][0] < 0 || snake[0][0] >= getWidth() || snake[0][1] < 0 || snake[0][1] >= getHeight()){
+                    gameTimer.cancel();
+                    gameTimer.purge();
+                    ((GameActivity)getContext()).gameOver(points);
                     return;
                 }
 
                 if (snake[0][0] == appleX && snake[0][1] == appleY){
                     points++;
+                    ((GameActivity)getContext()).addPoint(points);
 
                     newPoint();
                 }
@@ -146,7 +166,10 @@ public class GameView extends View {
                 postInvalidate();
             }
         },1500,600);
+
+
     }
+
 
 
 
@@ -156,19 +179,19 @@ public class GameView extends View {
         super.onDraw(canvas);
         canvas.drawColor(gameBgColor);
 
-        appleRect.left = (int)appleX;
-        appleRect.right = (int)appleX + snakeBodySize;
-        appleRect.top = (int)appleY;
-        appleRect.bottom = (int)appleY + snakeBodySize;
+        appleRect.left = (int)appleX +5;
+        appleRect.right = (int)appleX + snakeBodySize-10;
+        appleRect.top = (int)appleY+5;
+        appleRect.bottom = (int)appleY + snakeBodySize-10;
 
         canvas.drawRect(appleRect, applePaint);
 
         for(int i=0;i<snakeLength;i++ ){
 
-            snakeHeadRect.left = snake[i][0];
-            snakeHeadRect.right = snake[i][0]+snakeBodySize;
-            snakeHeadRect.top = snake[i][1];
-            snakeHeadRect.bottom = snake[i][1]+snakeBodySize;
+            snakeHeadRect.left = snake[i][0] + 5;
+            snakeHeadRect.right = snake[i][0]+snakeBodySize - 10;
+            snakeHeadRect.top = snake[i][1] + 5;
+            snakeHeadRect.bottom = snake[i][1]+snakeBodySize - 10;
 
             canvas.drawRect(snakeHeadRect,snakeHeadPaint);
         }
@@ -200,13 +223,7 @@ public class GameView extends View {
                 break;
         }
 
-
-
-
     }
-
-
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

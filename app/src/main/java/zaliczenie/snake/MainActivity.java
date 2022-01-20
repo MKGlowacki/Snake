@@ -9,7 +9,7 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
 
-    GameView gameView;
+
     View playButton;
 
     @Override
@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gameView = (GameView) findViewById(R.id.gameViewId);
+
 
 
         playButton = findViewById(R.id.playButtonImageView);
@@ -26,9 +26,7 @@ public class MainActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playButton.setVisibility(View.INVISIBLE);
-                gameView.setVisibility(View.VISIBLE);
-                gameView.startGame();
+                startActivity(new Intent(getApplicationContext(), GameActivity.class));
 
             }
         });
